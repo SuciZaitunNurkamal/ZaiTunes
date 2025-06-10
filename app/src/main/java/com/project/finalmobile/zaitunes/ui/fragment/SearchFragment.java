@@ -79,11 +79,11 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
                         trackAdapter.updateData(tracks);
                     } else {
                         binding.trackRv.setVisibility(View.GONE);
-                        Toast.makeText(requireContext(), "Tidak ada hasil ditemukan", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.tidak_ada_hasil_ditemukan), Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     binding.trackRv.setVisibility(View.GONE);
-                    Toast.makeText(requireContext(), "Gagal memuat hasil pencarian", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.gagal_memuat_hasil_pencarian), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -91,7 +91,7 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
             public void onFailure(@NonNull Call<Response> call, @NonNull Throwable t) {
                 binding.progressBar.setVisibility(View.GONE);
                 binding.trackRv.setVisibility(View.GONE);
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.error) + ": " + getString(R.string.periksa_koneksi), Toast.LENGTH_SHORT).show();
             }
         });
     }

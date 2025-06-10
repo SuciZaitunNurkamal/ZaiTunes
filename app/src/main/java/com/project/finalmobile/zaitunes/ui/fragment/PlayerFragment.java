@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
-import com.project.finalmobile.R; // Pastikan import R ada
+import com.project.finalmobile.R;
 import com.project.finalmobile.databinding.FragmentPlayerBinding;
 import com.project.finalmobile.zaitunes.local.DatabaseContract.TrackColumns;
 import com.project.finalmobile.zaitunes.local.MappingHelper;
@@ -86,10 +86,16 @@ public class PlayerFragment extends Fragment {
                     }
                 } else {
                     android.util.Log.e("PlayerFragment", "List is empty!");
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.gagal_memuat_detail_lagu), Toast.LENGTH_SHORT).show());
+                    }
                 }
             } catch (Exception e) {
                 android.util.Log.e("PlayerFragment", "Error loading track details: " + e.getMessage());
                 e.printStackTrace();
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.terjadi_kesalahan), Toast.LENGTH_SHORT).show());
+                }
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -113,14 +119,14 @@ public class PlayerFragment extends Fragment {
 
         binding.trackNameTextView.setText(track.getTrackName());
         binding.artistNameTextView.setText(track.getArtistName());
-        binding.albumTextView.setText("Album: " + track.getCollectionName());
-        binding.genreTextView.setText("Genre: " + track.getPrimaryGenreName());
+        binding.albumTextView.setText(getString(R.string.album) + ": " + track.getCollectionName());
+        binding.genreTextView.setText(getString(R.string.genre) + ": " + track.getPrimaryGenreName());
 
         // Get year from release date
         String releaseDate = track.getReleaseDate();
         if (releaseDate != null && !releaseDate.isEmpty()) {
             String year = releaseDate.substring(0, 4);
-            binding.yearTextView.setText("Tahun: " + year);
+            binding.yearTextView.setText(getString(R.string.tahun) + ": " + year);
         }
 
         // Load cover image
@@ -143,7 +149,7 @@ public class PlayerFragment extends Fragment {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
             } else {
-                Toast.makeText(getContext(), "Link tidak tersedia", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.link_tidak_tersedia), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -175,7 +181,7 @@ public class PlayerFragment extends Fragment {
                 if (updatedRows > 0) {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            Toast.makeText(getContext(), "Rating diperbarui!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.rating_diperbarui), Toast.LENGTH_SHORT).show();
                             // Refresh the UI to show the new rating
                             binding.detailRatingBar.setRating(rating);
                         });
@@ -184,7 +190,7 @@ public class PlayerFragment extends Fragment {
                     android.util.Log.e("PlayerFragment", "Failed to update rating. No rows were updated.");
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            Toast.makeText(getContext(), "Gagal memperbarui rating", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.gagal_memperbarui_rating), Toast.LENGTH_SHORT).show();
                             // Revert the rating bar to the previous value
                             binding.detailRatingBar.setRating(currentTrack.getRating());
                         });
@@ -195,7 +201,7 @@ public class PlayerFragment extends Fragment {
                 e.printStackTrace();
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.terjadi_kesalahan), Toast.LENGTH_SHORT).show();
                         // Revert the rating bar to the previous value
                         binding.detailRatingBar.setRating(currentTrack.getRating());
                     });

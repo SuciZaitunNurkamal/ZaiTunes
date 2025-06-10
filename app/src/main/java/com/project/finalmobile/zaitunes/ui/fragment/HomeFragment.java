@@ -126,12 +126,12 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
                     } else {
                         binding.popularSongsRv.setVisibility(View.GONE);
                         binding.emptyPopularSongs.setVisibility(View.VISIBLE);
-                        binding.emptyPopularSongs.setText("Tidak ada lagu populer yang tersedia");
+                        binding.emptyPopularSongs.setText(getString(R.string.tidak_ada_lagu_populer));
                     }
                 } else {
                     binding.popularSongsRv.setVisibility(View.GONE);
                     binding.emptyPopularSongs.setVisibility(View.VISIBLE);
-                    binding.emptyPopularSongs.setText("Gagal memuat lagu populer");
+                    binding.emptyPopularSongs.setText(getString(R.string.gagal_memuat_lagu_populer));
                 }
             }
 
@@ -141,7 +141,7 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
                 binding.popularSongsProgressBar.setVisibility(View.GONE);
                 binding.popularSongsRv.setVisibility(View.GONE);
                 binding.emptyPopularSongs.setVisibility(View.VISIBLE);
-                binding.emptyPopularSongs.setText("Error: " + t.getMessage());
+                binding.emptyPopularSongs.setText(getString(R.string.error) + ": " + getString(R.string.periksa_koneksi));
             }
         });
     }

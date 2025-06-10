@@ -19,9 +19,12 @@
     <string name="rating_diperbarui">Rating diperbarui!</string>
     <string name="gagal_memperbarui_rating">Gagal memperbarui rating</string>
     <string name="link_tidak_tersedia">Link tidak tersedia</string>
+    <string name="terjadi_kesalahan">Terjadi kesalahan.</string>
+    <string name="gagal_memuat_detail_lagu">Gagal memuat detail lagu.</string>
     <string name="tidak_ada_hasil_ditemukan">Tidak ada hasil ditemukan</string>
     <string name="gagal_memuat_hasil_pencarian">Gagal memuat hasil pencarian</string>
     <string name="error">Kesalahan</string>
+    <string name="periksa_koneksi">Periksa koneksi internet Anda.</string>
     <string name="hapus_favorit">Hapus Favorit</string>
     <string name="yakin_hapus">Anda yakin ingin menghapus</string>
     <string name="batal">Batal</string>
