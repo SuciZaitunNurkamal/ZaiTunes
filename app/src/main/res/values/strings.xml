@@ -1,11 +1,6 @@
 <resources>
     <string name="app_name">FINALMOBILE</string>
     <string name="icon_description">ikon</string>
-    <string name="upload">Unggah</string>
-    <string name="tambahkan_keterangan">Tambahkan Keterangan</string>
-    <string name="tambahkan_mata_kuliah">Tambahkan Mata Kuliah</string>
-    <string name="tambahkan_deadline">Tambahkan Batas Waktu</string>
-    <string name="tambahkan_judul">Tambahkan Judul</string>
     <string name="get_started">Mulai</string>
     <string name="search">Cari</string>
     <string name="enter_song_or_artist">Masukkan judul lagu atau nama artis</string>

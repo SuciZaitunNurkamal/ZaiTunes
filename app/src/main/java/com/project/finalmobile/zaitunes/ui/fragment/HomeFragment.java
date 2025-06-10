@@ -150,13 +150,14 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
     public void onPopularSongClick(ResultsItem song) {
         if (binding == null || song == null) return;
         ContentValues values = new ContentValues();
-        values.put(TrackColumns._ID, song.getTrackId());
+        values.put(TrackColumns.TRACK_ID, song.getTrackId());
         values.put(TrackColumns.TRACK_NAME, song.getTrackName());
         values.put(TrackColumns.ARTIST_NAME, song.getArtistName());
         values.put(TrackColumns.COLLECTION_NAME, song.getCollectionName());
         values.put(TrackColumns.GENRE, song.getPrimaryGenreName());
         values.put(TrackColumns.RELEASE_DATE, song.getReleaseDate());
         values.put(TrackColumns.TRACK_VIEW_URL, song.getTrackViewUrl());
+        values.put(TrackColumns.ARTWORK_URL, song.getArtworkUrl100());
         values.put(TrackColumns.RATING, 0);
 
         Executors.newSingleThreadExecutor().execute(() -> ratedTrackHelper.insert(values));
