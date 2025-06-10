@@ -37,4 +37,6 @@
     <string name="dinilai">Dinilai</string>
     <string name="splash_title">Rasakan Irama Hidupkan Musikmu</string>
     <string name="mulai">Mulai</string>
+    <string name="lagu_berhasil_disimpan">Lagu berhasil disimpan ke favorit</string>
+    <string name="gagal_menyimpan_lagu">Gagal menyimpan lagu ke favorit</string>
 </resources>

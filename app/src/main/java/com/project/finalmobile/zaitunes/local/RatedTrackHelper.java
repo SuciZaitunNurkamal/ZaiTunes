@@ -10,6 +10,7 @@ import android.util.Log;
 import static com.project.finalmobile.zaitunes.local.DatabaseContract.TABLE_NAME;
 import static com.project.finalmobile.zaitunes.local.DatabaseContract.TrackColumns;
 
+// Helper class untuk operasi database
 public class RatedTrackHelper {
 
     private static final String DATABASE_TABLE = TABLE_NAME;
@@ -18,10 +19,12 @@ public class RatedTrackHelper {
     private SQLiteDatabase database;
     private boolean isOpen = false;
 
+    // Private constructor untuk singleton pattern
     private RatedTrackHelper(Context context) {
         dbHelper = new DatabaseHelper(context.getApplicationContext());
     }
 
+    // Method untuk mendapatkan instance (singleton)
     public static RatedTrackHelper getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (RatedTrackHelper.class) {
@@ -33,6 +36,7 @@ public class RatedTrackHelper {
         return INSTANCE;
     }
 
+    // Buka koneksi database
     public synchronized void open() throws SQLException {
         if (!isOpen) {
             database = dbHelper.getWritableDatabase();
@@ -41,6 +45,7 @@ public class RatedTrackHelper {
         }
     }
 
+    // Tutup koneksi database
     public synchronized void close() {
         if (isOpen) {
             if (database != null && database.isOpen()) {
@@ -52,6 +57,7 @@ public class RatedTrackHelper {
         }
     }
 
+    // Query semua data lagu
     public Cursor queryAll() {
         if (!isOpen) {
             open();

@@ -1,17 +1,27 @@
 package com.project.finalmobile.zaitunes.local;
 
+// Model class untuk lagu yang sudah di-rating
 public class RatedTrack {
 
     private long trackId;
+
     private String trackName;
+
     private String artistName;
+
     private String collectionName;
+
     private String primaryGenreName;
+
     private String releaseDate;
+
     private String trackViewUrl;
+
     private String artworkUrl100;
+
     private float rating;
 
+    // Getter dan setter methods
     public long getTrackId() {
         return trackId;
     }

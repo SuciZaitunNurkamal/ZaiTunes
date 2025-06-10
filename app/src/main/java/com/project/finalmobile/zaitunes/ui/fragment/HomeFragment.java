@@ -30,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import com.project.finalmobile.zaitunes.ui.adapter.DisplayMode;
 
+// Fragment untuk menampilkan halaman utama aplikasi
 public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrackClickListener, RatedTrackAdapter.OnTrackClickListener {
 
     private FragmentHomeBinding binding;
@@ -49,18 +50,20 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Inisialisasi database helper
         ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
         ratedTrackHelper.open();
 
+        // Inisialisasi API service
         apiService = RetrofitClient.getApiService();
         setupRecyclerViews();
 
-        // Tambahkan aksi klik untuk tombol settings
+        // Setup tombol settings
         binding.btnSettings.setOnClickListener(v -> {
             Navigation.findNavController(v).navigate(R.id.settingsFragment);
         });
 
-        // Tambahkan aksi klik untuk tombol refresh
+        // Setup tombol refresh
         binding.btnRefresh.setOnClickListener(v -> {
             loadRecentlyRatedTracks();
             fetchPopularSongs();
@@ -74,17 +77,21 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
         fetchPopularSongs();
     }
 
+    // Setup RecyclerView untuk daftar lagu
     private void setupRecyclerViews() {
+        // Adapter untuk lagu yang baru di-rating
         ratedTrackAdapter = new RatedTrackAdapter(new ArrayList<>(), this, DisplayMode.HOME);
         binding.recentlyRatedRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recentlyRatedRv.setAdapter(ratedTrackAdapter);
         binding.recentlyRatedRv.setNestedScrollingEnabled(false);
 
+        // Adapter untuk lagu populer
         popularSongAdapter = new PopularSongAdapter(new ArrayList<>(), this);
         binding.popularSongsRv.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.popularSongsRv.setAdapter(popularSongAdapter);
     }
 
+    // Load lagu yang baru di-rating dari database
     private void loadRecentlyRatedTracks() {
         Executors.newSingleThreadExecutor().execute(() -> {
             Cursor cursor = ratedTrackHelper.queryAll();
@@ -106,6 +113,7 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
         });
     }
 
+    // Fetch lagu populer dari API
     private void fetchPopularSongs() {
         binding.popularSongsProgressBar.setVisibility(View.VISIBLE);
         binding.popularSongsRv.setVisibility(View.GONE);
@@ -177,7 +185,7 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
 
     @Override
     public void onDeleteClick(RatedTrack track) {
-        // Implementasi delete akan kita lakukan di FavoritesFragment
+        // Implementasi delete ada di FavoritesFragment
     }
 
     @Override

@@ -24,11 +24,12 @@ import java.util.concurrent.Executors;
 import com.project.finalmobile.zaitunes.ui.adapter.DisplayMode;
 import android.util.Log;
 
+// Fragment untuk menampilkan lagu favorit
 public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnTrackClickListener {
 
     private FragmentFavoritesBinding binding;
-    private RatedTrackAdapter ratedTrackAdapter;
     private RatedTrackHelper ratedTrackHelper;
+    private RatedTrackAdapter ratedTrackAdapter;
 
     public FavoritesFragment() {}
 
@@ -41,6 +42,7 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Inisialisasi database helper
         ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
         ratedTrackHelper.open();
         setupRecyclerView();
@@ -56,12 +58,14 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
         loadRatedTracks();
     }
 
+    // Setup RecyclerView untuk daftar favorit
     private void setupRecyclerView() {
         ratedTrackAdapter = new RatedTrackAdapter(new ArrayList<>(), this, DisplayMode.FAVORITES);
         binding.favoritesRv.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.favoritesRv.setAdapter(ratedTrackAdapter);
     }
 
+    // Load lagu favorit dari database
     private void loadRatedTracks() {
         Executors.newSingleThreadExecutor().execute(() -> {
             if (ratedTrackHelper == null) return;
@@ -95,6 +99,7 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
         });
     }
 
+    // Handle klik pada lagu favorit
     @Override
     public void onRatedTrackClick(RatedTrack track) {
         if (track != null) {

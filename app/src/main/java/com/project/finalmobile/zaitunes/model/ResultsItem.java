@@ -2,7 +2,8 @@ package com.project.finalmobile.zaitunes.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ResultsItem{
+// Model class untuk data lagu dari API iTunes
+public class ResultsItem {
 
 	@SerializedName("artworkUrl100")
 	private String artworkUrl100;

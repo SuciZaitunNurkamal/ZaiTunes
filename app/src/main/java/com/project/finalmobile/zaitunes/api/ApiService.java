@@ -7,7 +7,6 @@ import retrofit2.http.Query;
 import com.project.finalmobile.zaitunes.model.RssResponse;
 
 public interface ApiService {
-
     @GET("search")
     Call<Response> searchTrack(
             @Query("term") String searchTerm,
@@ -20,7 +19,6 @@ public interface ApiService {
             @Query("term") String searchTerm,
             @Query("limit") int limit);
 
-    // Add this method for popular songs
     @GET("search?media=music&entity=song&limit=10")
     Call<Response> getPopularSongs(@Query("term") String searchTerm);
-}
+} 

@@ -15,11 +15,9 @@ public class PopularSongAdapter extends RecyclerView.Adapter<PopularSongAdapter.
     private List<ResultsItem> songList;
     private OnTrackClickListener listener; // <-- Tambahkan listener
 
-    // --- Interface untuk menangani klik ---
     public interface OnTrackClickListener {
         void onPopularSongClick(ResultsItem song);
     }
-    // ------------------------------------
 
     public PopularSongAdapter(List<ResultsItem> songList, OnTrackClickListener listener) {
         this.songList = songList;

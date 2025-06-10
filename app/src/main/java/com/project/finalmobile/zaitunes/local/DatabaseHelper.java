@@ -8,7 +8,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "zaitunes.db";
-    private static final int DATABASE_VERSION = 5; // Increment version to force upgrade
+    private static final int DATABASE_VERSION = 6;
 
     private static final String SQL_CREATE_TABLE_RATED_TRACKS = String.format(
             "CREATE TABLE %s"

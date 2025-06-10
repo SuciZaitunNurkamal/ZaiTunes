@@ -27,6 +27,7 @@ import retrofit2.Callback;
 import android.database.Cursor;
 import android.widget.Toast;
 
+// Fragment untuk pencarian lagu
 public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClickListener {
 
     private FragmentSearchBinding binding;
@@ -45,11 +46,13 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Inisialisasi API service dan database helper
         apiService = RetrofitClient.getApiService();
         ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
         ratedTrackHelper.open();
         setUpRecyclerView();
 
+        // Setup tombol pencarian
         binding.searchButton.setOnClickListener(v -> {
             String searchQuery = binding.searchEditText.getText().toString().trim();
             if (!searchQuery.isEmpty()) {
@@ -58,12 +61,14 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
         });
     }
 
+    // Setup RecyclerView untuk hasil pencarian
     private void setUpRecyclerView() {
         trackAdapter = new TrackAdapter(new ArrayList<>(), this);
         binding.trackRv.setAdapter(trackAdapter);
         binding.trackRv.setLayoutManager(new LinearLayoutManager(requireContext()));
     }
 
+    // Lakukan pencarian lagu
     private void performSearch(String searchQuery) {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.trackRv.setVisibility(View.GONE);
@@ -99,13 +104,6 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
     @Override
     public void onTrackClick(ResultsItem track) {
         if (track != null) {
-            // Debug logging
-            android.util.Log.d("SearchFragment", "Saving track: " + track.getTrackName());
-            android.util.Log.d("SearchFragment", "Artist: " + track.getArtistName());
-            android.util.Log.d("SearchFragment", "Album: " + track.getCollectionName());
-            android.util.Log.d("SearchFragment", "Genre: " + track.getPrimaryGenreName());
-            android.util.Log.d("SearchFragment", "Artwork URL: " + track.getArtworkUrl100());
-
             ContentValues values = new ContentValues();
             values.put(TrackColumns.TRACK_ID, track.getTrackId());
             values.put(TrackColumns.TRACK_NAME, track.getTrackName());
@@ -115,26 +113,50 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
             values.put(TrackColumns.RELEASE_DATE, track.getReleaseDate());
             values.put(TrackColumns.TRACK_VIEW_URL, track.getTrackViewUrl());
             values.put(TrackColumns.ARTWORK_URL, track.getArtworkUrl100());
-            values.put(TrackColumns.RATING, 0); // Initial rating
+            values.put(TrackColumns.RATING, 0);
 
             Executors.newSingleThreadExecutor().execute(() -> {
-                Cursor cursor = null;
                 try {
-                    cursor = ratedTrackHelper.queryById(String.valueOf(track.getTrackId()));
-                    if (cursor != null && cursor.getCount() > 0) {
-                        // Data already exists, no need to insert again to avoid overwriting rating
-                        android.util.Log.d("SearchFragment", "Track already exists in database");
-                    } else {
-                        long id = ratedTrackHelper.insert(values);
-                        android.util.Log.d("SearchFragment", "Inserted track with ID: " + id);
+                    // Cek apakah lagu sudah ada di database
+                    Cursor cursor = null;
+                    try {
+                        cursor = ratedTrackHelper.queryById(String.valueOf(track.getTrackId()));
+                        boolean exists = false;
+                        if (cursor != null && cursor.moveToFirst()) {
+                            exists = true;
+                            android.util.Log.d("SearchFragment", "Track already exists in DB: " + track.getTrackId());
+                        } else {
+                            android.util.Log.d("SearchFragment", "Track does not exist in DB, attempting to insert: " + track.getTrackId());
+                        }
+                        if (cursor != null) {
+                            cursor.close();
+                        }
+
+                        if (!exists) {
+                            long id = ratedTrackHelper.insert(values);
+                            if (id > 0) {
+                                requireActivity().runOnUiThread(() -> {
+                                    Toast.makeText(requireContext(), getString(R.string.lagu_berhasil_disimpan), Toast.LENGTH_SHORT).show();
+                                    android.util.Log.d("SearchFragment", "Track saved successfully with ID: " + id);
+                                });
+                            } else {
+                                requireActivity().runOnUiThread(() -> {
+                                    Toast.makeText(requireContext(), getString(R.string.gagal_menyimpan_lagu), Toast.LENGTH_SHORT).show();
+                                    android.util.Log.e("SearchFragment", "Failed to save track: insert returned ID <= 0");
+                                });
+                            }
+                        }
+                    } finally {
+                        if (cursor != null) {
+                            cursor.close();
+                        }
                     }
                 } catch (Exception e) {
                     android.util.Log.e("SearchFragment", "Error saving track: " + e.getMessage());
                     e.printStackTrace();
-                } finally {
-                    if (cursor != null) {
-                        cursor.close();
-                    }
+                    requireActivity().runOnUiThread(() -> 
+                        Toast.makeText(requireContext(), getString(R.string.gagal_menyimpan_lagu), Toast.LENGTH_SHORT).show()
+                    );
                 }
             });
 
