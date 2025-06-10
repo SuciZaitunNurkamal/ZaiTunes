@@ -11,4 +11,6 @@
     <color name="kuningmuda">#FAE17C</color>
     <color name="kuningsedang">#F7C14C</color>
     <color name="hint">#80000000</color>
+    <color name="primaryTextColor">@color/black</color>
+    <color name="alwaysWhiteText">#FFFFFFFF</color>
 </resources>

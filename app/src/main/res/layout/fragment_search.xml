@@ -13,14 +13,15 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:startIconDrawable="@drawable/ic_search_24">
+        app:startIconDrawable="@drawable/ic_search_24"
+        app:hintTextColor="@color/hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/enter_song_or_artist"
-            android:textColor="@color/white"
+            android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/hint"
             android:inputType="text"
             android:maxLines="1" />
