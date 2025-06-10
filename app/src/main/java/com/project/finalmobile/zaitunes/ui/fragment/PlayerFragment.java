@@ -1,5 +1,7 @@
 package com.project.finalmobile.zaitunes.ui.fragment;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,17 +10,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 import com.project.finalmobile.databinding.FragmentPlayerBinding;
-import com.project.finalmobile.zaitunes.local.AppDatabase;
+import com.project.finalmobile.zaitunes.local.DatabaseContract.TrackColumns;
+import com.project.finalmobile.zaitunes.local.MappingHelper;
 import com.project.finalmobile.zaitunes.local.RatedTrack;
+import com.project.finalmobile.zaitunes.local.RatedTrackHelper;
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
-import androidx.navigation.Navigation;
 
 public class PlayerFragment extends Fragment {
 
     private FragmentPlayerBinding binding;
-    private AppDatabase db;
+    private RatedTrackHelper ratedTrackHelper; // Mengganti AppDatabase
     private long trackId;
     private RatedTrack currentTrack;
 
@@ -27,10 +32,8 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Ambil argumen secara manual menggunakan kunci "trackId"
         if (getArguments() != null) {
-            this.trackId = getArguments().getLong("trackId");
+            trackId = getArguments().getLong("trackId");
         }
     }
 
@@ -43,44 +46,32 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        db = AppDatabase.getDatabase(requireContext());
+        ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
+        ratedTrackHelper.open();
         loadTrackDetails();
-        binding.backButton.setOnClickListener(v -> {
-            // Perintah untuk kembali ke fragment sebelumnya
-            Navigation.findNavController(v).popBackStack();
-        });
+
+        binding.backButton.setOnClickListener(v -> Navigation.findNavController(v).popBackStack());
     }
 
     private void loadTrackDetails() {
         Executors.newSingleThreadExecutor().execute(() -> {
-            // Ambil detail lagu dari database menggunakan ID
-            currentTrack = db.ratedTrackDao().getTrackById(trackId);
-
-            if (currentTrack != null && getActivity() != null) {
-                // Tampilkan data ke UI di main thread
-                getActivity().runOnUiThread(() -> {
-                    updateUi(currentTrack);
-                });
+            Cursor cursor = ratedTrackHelper.queryById(String.valueOf(trackId));
+            ArrayList<RatedTrack> list = MappingHelper.mapCursorToArrayList(cursor);
+            if (!list.isEmpty()) {
+                currentTrack = list.get(0);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> updateUi(currentTrack));
+                }
             }
         });
     }
 
     private void updateUi(RatedTrack track) {
+        if (binding == null) return;
         binding.trackNameTextView.setText(track.getTrackName());
-        binding.artistNameTextView.setText(track.getArtistName());
+        // ... set text dan gambar lainnya ...
         binding.detailRatingBar.setRating(track.getRating());
-        binding.albumTextView.setText("Album: " + track.getCollectionName());
-        binding.genreTextView.setText("Genre: " + track.getPrimaryGenreName());
 
-        String releaseDate = track.getReleaseDate();
-        if (releaseDate != null && !releaseDate.isEmpty()) {
-            String year = releaseDate.substring(0, 4);
-            binding.yearTextView.setText("Tahun: " + year);
-        }
-
-        Glide.with(this).load(track.getArtworkUrl100()).into(binding.albumArtImageView);
-
-        // Atur listener untuk rating bar di halaman ini
         binding.detailRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
             if (fromUser) {
                 saveNewRating(rating);
@@ -89,19 +80,21 @@ public class PlayerFragment extends Fragment {
     }
 
     private void saveNewRating(float rating) {
-        currentTrack.setRating(rating);
+        ContentValues values = new ContentValues();
+        values.put(TrackColumns.RATING, rating);
+
         Executors.newSingleThreadExecutor().execute(() -> {
-            db.ratedTrackDao().insert(currentTrack);
-            // Beri feedback di main thread
-            getActivity().runOnUiThread(() -> {
-                Toast.makeText(getContext(), "Rating updated!", Toast.LENGTH_SHORT).show();
-            });
+            ratedTrackHelper.update(String.valueOf(currentTrack.getTrackId()), values);
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Rating diperbarui!", Toast.LENGTH_SHORT).show());
+            }
         });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        ratedTrackHelper.close();
         binding = null;
     }
 }

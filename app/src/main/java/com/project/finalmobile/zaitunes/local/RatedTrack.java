@@ -1,47 +1,15 @@
 package com.project.finalmobile.zaitunes.local;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
-// @Entity menandakan bahwa class ini adalah sebuah tabel database.
-@Entity(tableName = "rated_tracks")
 public class RatedTrack {
 
-    // @PrimaryKey menandakan bahwa 'trackId' adalah kunci unik untuk setiap baris.
-    @PrimaryKey
     private long trackId;
-
-    // @ColumnInfo digunakan untuk memberi nama kolom di tabel.
-    // Jika namanya sama dengan variabel, ini opsional tapi praktik yang baik.
-    @ColumnInfo(name = "track_name")
     private String trackName;
-
-    @ColumnInfo(name = "artist_name")
     private String artistName;
-
-    @ColumnInfo(name = "artwork_url")
-    private String artworkUrl100;
-
-    @ColumnInfo(name = "rating")
-    private float rating;
-
-    @ColumnInfo(name = "collection_name")
     private String collectionName;
-
-    @ColumnInfo(name = "genre")
     private String primaryGenreName;
-
-    @ColumnInfo(name = "release_date")
     private String releaseDate;
-
-    // Room membutuhkan constructor kosong
-    public RatedTrack() {
-    }
-
-    // --- Getters and Setters ---
-    // Anda bisa generate ini secara otomatis di Android Studio
-    // dengan cara: Klik kanan -> Generate -> Getter and Setter -> Pilih semua
+    private String trackViewUrl;
+    private float rating;
 
     public long getTrackId() {
         return trackId;
@@ -67,12 +35,36 @@ public class RatedTrack {
         this.artistName = artistName;
     }
 
-    public String getArtworkUrl100() {
-        return artworkUrl100;
+    public String getCollectionName() {
+        return collectionName;
     }
 
-    public void setArtworkUrl100(String artworkUrl100) {
-        this.artworkUrl100 = artworkUrl100;
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
+    }
+
+    public String getPrimaryGenreName() {
+        return primaryGenreName;
+    }
+
+    public void setPrimaryGenreName(String primaryGenreName) {
+        this.primaryGenreName = primaryGenreName;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public String getTrackViewUrl() {
+        return trackViewUrl;
+    }
+
+    public void setTrackViewUrl(String trackViewUrl) {
+        this.trackViewUrl = trackViewUrl;
     }
 
     public float getRating() {
@@ -83,10 +75,13 @@ public class RatedTrack {
         this.rating = rating;
     }
 
-    public String getCollectionName() { return collectionName; }
-    public void setCollectionName(String collectionName) { this.collectionName = collectionName; }
-    public String getPrimaryGenreName() { return primaryGenreName; }
-    public void setPrimaryGenreName(String primaryGenreName) { this.primaryGenreName = primaryGenreName; }
-    public String getReleaseDate() { return releaseDate; }
-    public void setReleaseDate(String releaseDate) { this.releaseDate = releaseDate; }
+    private String artworkUrl100;
+
+    public String getArtworkUrl100() {
+        return artworkUrl100;
+    }
+
+    public void setArtworkUrl100(String artworkUrl100) {
+        this.artworkUrl100 = artworkUrl100;
+    }
 }
