@@ -1,21 +1,12 @@
 <resources>
     <string name="app_name">FINALMOBILE</string>
     <string name="icon_description">ikon</string>
-    <string name="welcome_to">SELAMAT DATANG DI</string>
-    <string name="appname">ZaiDo</string>
     <string name="upload">Unggah</string>
     <string name="tambahkan_keterangan">Tambahkan Keterangan</string>
     <string name="tambahkan_mata_kuliah">Tambahkan Mata Kuliah</string>
     <string name="tambahkan_deadline">Tambahkan Batas Waktu</string>
     <string name="tambahkan_judul">Tambahkan Judul</string>
-    <string name="plan_it_do_it_love_it">Rencanakan. Kerjakan. Nikmati.</string>
     <string name="get_started">Mulai</string>
-    <string name="judul">Judul</string>
-    <string name="deskripsi">Deskripsi</string>
-    <string name="save">Simpan</string>
-    <string name="delete">Hapus</string>
-    <string name="tanggal">Tanggal</string>
-    <string name="hello_blank_fragment">Halo fragment kosong</string>
     <string name="search">Cari</string>
     <string name="enter_song_or_artist">Masukkan judul lagu atau nama artis</string>
     <string name="lagu_populer">Lagu Populer</string>
@@ -46,4 +37,6 @@
     <string name="beranda">Beranda</string>
     <string name="cari">Cari</string>
     <string name="dinilai">Dinilai</string>
+    <string name="splash_title">Rasakan Irama Hidupkan Musikmu</string>
+    <string name="mulai">Mulai</string>
 </resources>
