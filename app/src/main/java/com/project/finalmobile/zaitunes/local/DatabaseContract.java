@@ -20,6 +20,7 @@ public final class DatabaseContract {
         public static final String RELEASE_DATE = "release_date";
         public static final String TRACK_VIEW_URL = "track_view_url";
         public static final String RATING = "rating";
+        public static final String ARTWORK_URL = "artwork_url";
 
         private TrackColumns() {
             // Private constructor to prevent instantiation

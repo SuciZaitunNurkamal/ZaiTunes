@@ -1,12 +1,13 @@
 package com.project.finalmobile.zaitunes.model;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 public class RssResponse {
-    @SerializedName("feed")
-    private RssFeed feed;
+    @SerializedName("results")
+    private List<ResultsItem> results;
 
-    public RssFeed getFeed() {
-        return feed;
+    public List<ResultsItem> getResults() {
+        return results;
     }
 }

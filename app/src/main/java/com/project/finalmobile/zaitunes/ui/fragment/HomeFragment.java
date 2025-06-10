@@ -3,8 +3,6 @@ package com.project.finalmobile.zaitunes.ui.fragment;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,7 @@ import com.project.finalmobile.zaitunes.local.RatedTrackHelper;
 import com.project.finalmobile.zaitunes.api.ApiService;
 import com.project.finalmobile.zaitunes.api.RetrofitClient;
 import com.project.finalmobile.zaitunes.model.ResultsItem;
-import com.project.finalmobile.zaitunes.model.RssResponse;
+import com.project.finalmobile.zaitunes.model.Response;
 import com.project.finalmobile.zaitunes.ui.adapter.PopularSongAdapter;
 import com.project.finalmobile.zaitunes.ui.adapter.RatedTrackAdapter;
 import java.util.ArrayList;
@@ -30,13 +28,12 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 import com.project.finalmobile.zaitunes.ui.adapter.DisplayMode;
 
 public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrackClickListener, RatedTrackAdapter.OnTrackClickListener {
 
     private FragmentHomeBinding binding;
-    private RatedTrackHelper ratedTrackHelper; // Mengganti AppDatabase
+    private RatedTrackHelper ratedTrackHelper;
     private ApiService apiService;
     private RatedTrackAdapter ratedTrackAdapter;
     private PopularSongAdapter popularSongAdapter;
@@ -52,12 +49,22 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Menggunakan RatedTrackHelper
         ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
         ratedTrackHelper.open();
 
         apiService = RetrofitClient.getApiService();
         setupRecyclerViews();
+
+        // Tambahkan aksi klik untuk tombol settings
+        binding.btnSettings.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.settingsFragment);
+        });
+
+        // Tambahkan aksi klik untuk tombol refresh
+        binding.btnRefresh.setOnClickListener(v -> {
+            loadRecentlyRatedTracks();
+            fetchPopularSongs();
+        });
     }
 
     @Override
@@ -80,30 +87,68 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
 
     private void loadRecentlyRatedTracks() {
         Executors.newSingleThreadExecutor().execute(() -> {
-            // Mengambil data menggunakan Cursor
             Cursor cursor = ratedTrackHelper.queryAll();
-            // Mengubah Cursor menjadi ArrayList
             final List<RatedTrack> tracks = MappingHelper.mapCursorToArrayList(cursor);
 
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
                     if (binding == null) return;
-                    // Logika empty state tetap sama
-                    ratedTrackAdapter.updateData(tracks);
+                    if (tracks.isEmpty()) {
+                        binding.recentlyRatedRv.setVisibility(View.GONE);
+                        binding.emptyRecentlyRated.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.recentlyRatedRv.setVisibility(View.VISIBLE);
+                        binding.emptyRecentlyRated.setVisibility(View.GONE);
+                        ratedTrackAdapter.updateData(tracks);
+                    }
                 });
             }
         });
     }
 
     private void fetchPopularSongs() {
-        // Metode ini tidak berubah karena tidak menyentuh database lokal
-        // ... (biarkan isi metode fetchPopularSongs tetap sama)
+        binding.popularSongsProgressBar.setVisibility(View.VISIBLE);
+        binding.popularSongsRv.setVisibility(View.GONE);
+        binding.emptyPopularSongs.setVisibility(View.GONE);
+
+        apiService.getPopularSongs("top").enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(@NonNull Call<Response> call, @NonNull retrofit2.Response<Response> response) {
+                binding.popularSongsProgressBar.setVisibility(View.GONE);
+                if (binding == null) return;
+                
+                if (response.isSuccessful() && response.body() != null && response.body().getResults() != null) {
+                    List<ResultsItem> songs = response.body().getResults();
+                    if (!songs.isEmpty()) {
+                        binding.popularSongsRv.setVisibility(View.VISIBLE);
+                        binding.emptyPopularSongs.setVisibility(View.GONE);
+                        popularSongAdapter.updateData(songs);
+                    } else {
+                        binding.popularSongsRv.setVisibility(View.GONE);
+                        binding.emptyPopularSongs.setVisibility(View.VISIBLE);
+                        binding.emptyPopularSongs.setText("Tidak ada lagu populer yang tersedia");
+                    }
+                } else {
+                    binding.popularSongsRv.setVisibility(View.GONE);
+                    binding.emptyPopularSongs.setVisibility(View.VISIBLE);
+                    binding.emptyPopularSongs.setText("Gagal memuat lagu populer");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Response> call, @NonNull Throwable t) {
+                if (binding == null) return;
+                binding.popularSongsProgressBar.setVisibility(View.GONE);
+                binding.popularSongsRv.setVisibility(View.GONE);
+                binding.emptyPopularSongs.setVisibility(View.VISIBLE);
+                binding.emptyPopularSongs.setText("Error: " + t.getMessage());
+            }
+        });
     }
 
     @Override
     public void onPopularSongClick(ResultsItem song) {
         if (binding == null || song == null) return;
-        // Menggunakan ContentValues untuk menyimpan data
         ContentValues values = new ContentValues();
         values.put(TrackColumns._ID, song.getTrackId());
         values.put(TrackColumns.TRACK_NAME, song.getTrackName());
@@ -112,7 +157,7 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
         values.put(TrackColumns.GENRE, song.getPrimaryGenreName());
         values.put(TrackColumns.RELEASE_DATE, song.getReleaseDate());
         values.put(TrackColumns.TRACK_VIEW_URL, song.getTrackViewUrl());
-        values.put(TrackColumns.RATING, 0); // Rating awal
+        values.put(TrackColumns.RATING, 0);
 
         Executors.newSingleThreadExecutor().execute(() -> ratedTrackHelper.insert(values));
 
@@ -137,7 +182,6 @@ public class HomeFragment extends Fragment implements PopularSongAdapter.OnTrack
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ratedTrackHelper.close(); // Tutup helper
         binding = null;
     }
 }

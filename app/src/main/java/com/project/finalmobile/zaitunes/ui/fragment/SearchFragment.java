@@ -25,13 +25,14 @@ import java.util.concurrent.Executors;
 import retrofit2.Call;
 import retrofit2.Callback;
 import android.database.Cursor;
+import android.widget.Toast;
 
 public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClickListener {
 
     private FragmentSearchBinding binding;
     private ApiService apiService;
     private TrackAdapter trackAdapter;
-    private RatedTrackHelper ratedTrackHelper; // Mengganti AppDatabase
+    private RatedTrackHelper ratedTrackHelper;
 
     public SearchFragment() {}
 
@@ -45,7 +46,6 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         apiService = RetrofitClient.getApiService();
-        // Menggunakan RatedTrackHelper
         ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
         ratedTrackHelper.open();
         setUpRecyclerView();
@@ -65,32 +65,76 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
     }
 
     private void performSearch(String searchQuery) {
-        // Metode ini tidak berubah
-        // ... (biarkan isi metode performSearch tetap sama)
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.trackRv.setVisibility(View.GONE);
+        
+        apiService.searchMusicSongs(searchQuery, 20).enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(@NonNull Call<Response> call, @NonNull retrofit2.Response<Response> response) {
+                binding.progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    List<ResultsItem> tracks = response.body().getResults();
+                    if (tracks != null && !tracks.isEmpty()) {
+                        binding.trackRv.setVisibility(View.VISIBLE);
+                        trackAdapter.updateData(tracks);
+                    } else {
+                        binding.trackRv.setVisibility(View.GONE);
+                        Toast.makeText(requireContext(), "Tidak ada hasil ditemukan", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    binding.trackRv.setVisibility(View.GONE);
+                    Toast.makeText(requireContext(), "Gagal memuat hasil pencarian", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Response> call, @NonNull Throwable t) {
+                binding.progressBar.setVisibility(View.GONE);
+                binding.trackRv.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public void onTrackClick(ResultsItem track) {
         if (track != null) {
-            // Menggunakan ContentValues untuk menyimpan data
+            // Debug logging
+            android.util.Log.d("SearchFragment", "Saving track: " + track.getTrackName());
+            android.util.Log.d("SearchFragment", "Artist: " + track.getArtistName());
+            android.util.Log.d("SearchFragment", "Album: " + track.getCollectionName());
+            android.util.Log.d("SearchFragment", "Genre: " + track.getPrimaryGenreName());
+            android.util.Log.d("SearchFragment", "Artwork URL: " + track.getArtworkUrl100());
+
             ContentValues values = new ContentValues();
-            values.put(TrackColumns._ID, track.getTrackId());
+            values.put(TrackColumns.TRACK_ID, track.getTrackId());
             values.put(TrackColumns.TRACK_NAME, track.getTrackName());
             values.put(TrackColumns.ARTIST_NAME, track.getArtistName());
             values.put(TrackColumns.COLLECTION_NAME, track.getCollectionName());
             values.put(TrackColumns.GENRE, track.getPrimaryGenreName());
             values.put(TrackColumns.RELEASE_DATE, track.getReleaseDate());
             values.put(TrackColumns.TRACK_VIEW_URL, track.getTrackViewUrl());
-            values.put(TrackColumns.RATING, 0); // Rating awal
+            values.put(TrackColumns.ARTWORK_URL, track.getArtworkUrl100());
+            values.put(TrackColumns.RATING, 0); // Initial rating
 
             Executors.newSingleThreadExecutor().execute(() -> {
-                // Cek dulu apakah data sudah ada, jika sudah update, jika belum insert
-                Cursor cursor = ratedTrackHelper.queryById(String.valueOf(track.getTrackId()));
-                if (cursor != null && cursor.getCount() > 0) {
-                    // Data sudah ada, tidak perlu di-insert lagi agar tidak menimpa rating
-                    cursor.close();
-                } else {
-                    ratedTrackHelper.insert(values);
+                Cursor cursor = null;
+                try {
+                    cursor = ratedTrackHelper.queryById(String.valueOf(track.getTrackId()));
+                    if (cursor != null && cursor.getCount() > 0) {
+                        // Data already exists, no need to insert again to avoid overwriting rating
+                        android.util.Log.d("SearchFragment", "Track already exists in database");
+                    } else {
+                        long id = ratedTrackHelper.insert(values);
+                        android.util.Log.d("SearchFragment", "Inserted track with ID: " + id);
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("SearchFragment", "Error saving track: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
                 }
             });
 
@@ -103,7 +147,9 @@ public class SearchFragment extends Fragment implements TrackAdapter.OnTrackClic
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ratedTrackHelper.close(); // Tutup helper
+        if (ratedTrackHelper != null) {
+            ratedTrackHelper.close();
+        }
         binding = null;
     }
 }

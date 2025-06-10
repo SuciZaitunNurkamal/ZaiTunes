@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import com.project.finalmobile.zaitunes.ui.adapter.DisplayMode;
+import android.util.Log;
 
 public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnTrackClickListener {
 
@@ -43,6 +44,10 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
         ratedTrackHelper = RatedTrackHelper.getInstance(requireContext());
         ratedTrackHelper.open();
         setupRecyclerView();
+        // Tambahkan aksi klik untuk tombol refresh
+        binding.btnRefresh.setOnClickListener(v -> {
+            loadRatedTracks();
+        });
     }
 
     @Override
@@ -60,20 +65,32 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
     private void loadRatedTracks() {
         Executors.newSingleThreadExecutor().execute(() -> {
             if (ratedTrackHelper == null) return;
-            Cursor dataCursor = ratedTrackHelper.queryAll();
-            final List<RatedTrack> tracks = MappingHelper.mapCursorToArrayList(dataCursor);
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> {
-                    if (binding == null) return;
-                    if (tracks.isEmpty()) {
-                        binding.favoritesRv.setVisibility(View.GONE);
-                        binding.emptyViewText.setVisibility(View.VISIBLE);
-                    } else {
-                        binding.favoritesRv.setVisibility(View.VISIBLE);
-                        binding.emptyViewText.setVisibility(View.GONE);
-                        ratedTrackAdapter.updateData(tracks);
-                    }
-                });
+            Cursor dataCursor = null;
+            try {
+                dataCursor = ratedTrackHelper.queryAll();
+                final List<RatedTrack> tracks = MappingHelper.mapCursorToArrayList(dataCursor);
+                Log.d("FavoritesFragment", "Loaded " + tracks.size() + " tracks");
+                
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (binding == null) return;
+                        if (tracks.isEmpty()) {
+                            binding.favoritesRv.setVisibility(View.GONE);
+                            binding.emptyViewText.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.favoritesRv.setVisibility(View.VISIBLE);
+                            binding.emptyViewText.setVisibility(View.GONE);
+                            ratedTrackAdapter.updateData(tracks);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.e("FavoritesFragment", "Error loading tracks: " + e.getMessage());
+                e.printStackTrace();
+            } finally {
+                if (dataCursor != null) {
+                    dataCursor.close();
+                }
             }
         });
     }
@@ -81,6 +98,7 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
     @Override
     public void onRatedTrackClick(RatedTrack track) {
         if (track != null) {
+            Log.d("FavoritesFragment", "Track clicked: " + track.getTrackName() + " (ID: " + track.getTrackId() + ")");
             Bundle bundle = new Bundle();
             bundle.putLong("trackId", track.getTrackId());
             Navigation.findNavController(requireView()).navigate(R.id.action_favoritesFragment_to_playerFragment, bundle);
@@ -96,7 +114,8 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
                 .setPositiveButton("Hapus", (dialog, which) -> {
                     Executors.newSingleThreadExecutor().execute(() -> {
                         if (ratedTrackHelper != null) {
-                            ratedTrackHelper.delete(String.valueOf(track.getTrackId()));
+                            int deleted = ratedTrackHelper.delete(String.valueOf(track.getTrackId()));
+                            Log.d("FavoritesFragment", "Deleted " + deleted + " tracks");
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(this::loadRatedTracks);
                             }
@@ -111,7 +130,9 @@ public class FavoritesFragment extends Fragment implements RatedTrackAdapter.OnT
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Do not close ratedTrackHelper here if it's shared
+        if (ratedTrackHelper != null) {
+            ratedTrackHelper.close();
+        }
         binding = null;
     }
 }

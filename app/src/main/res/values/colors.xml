@@ -2,15 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="sage">#81C7C7</color>
-    <color name="salem">#FFB5BA</color>
     <color name="kuning">#FFF8D2</color>
     <color name="cream">#FEF9F2</color>
-    <color name="blue">#789DBC</color>
     <color name="ungu">#DD88CF</color>
     <color name="ungutua">#623A6C</color>
     <color name="orange">#F7A01B</color>
     <color name="orangedark">#C77A00</color>
     <color name="kuningmuda">#FAE17C</color>
     <color name="kuningsedang">#F7C14C</color>
+    <color name="hint">#80000000</color>
 </resources>

@@ -9,6 +9,7 @@ public class RatedTrack {
     private String primaryGenreName;
     private String releaseDate;
     private String trackViewUrl;
+    private String artworkUrl100;
     private float rating;
 
     public long getTrackId() {
@@ -67,21 +68,19 @@ public class RatedTrack {
         this.trackViewUrl = trackViewUrl;
     }
 
-    public float getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
-    }
-
-    private String artworkUrl100;
-
     public String getArtworkUrl100() {
         return artworkUrl100;
     }
 
     public void setArtworkUrl100(String artworkUrl100) {
         this.artworkUrl100 = artworkUrl100;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 }

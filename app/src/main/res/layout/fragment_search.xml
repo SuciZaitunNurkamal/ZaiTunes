@@ -19,7 +19,9 @@
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter song or artist name"
+            android:hint="@string/enter_song_or_artist"
+            android:textColor="@color/white"
+            android:textColorHint="@color/hint"
             android:inputType="text"
             android:maxLines="1" />
 
@@ -31,7 +33,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
-        android:text="Search"/>
+        android:text="@string/search"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/trackRv"

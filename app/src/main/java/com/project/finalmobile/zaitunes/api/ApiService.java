@@ -1,11 +1,9 @@
 package com.project.finalmobile.zaitunes.api;
 
 import retrofit2.Call;
-//import retrofit2.Response;
 import com.project.finalmobile.zaitunes.model.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import retrofit2.http.Url;
 import com.project.finalmobile.zaitunes.model.RssResponse;
 
 public interface ApiService {
@@ -22,6 +20,7 @@ public interface ApiService {
             @Query("term") String searchTerm,
             @Query("limit") int limit);
 
-    @GET
-    Call<RssResponse> getTopSongs(@Url String url);
+    // Add this method for popular songs
+    @GET("search?media=music&entity=song&limit=10")
+    Call<Response> getPopularSongs(@Query("term") String searchTerm);
 }

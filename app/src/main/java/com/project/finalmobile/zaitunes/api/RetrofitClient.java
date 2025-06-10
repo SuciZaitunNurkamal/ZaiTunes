@@ -6,31 +6,27 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    public static final String BASE_URL = "https://itunes.apple.com/";
-
+    private static final String BASE_URL = "https://itunes.apple.com/";
     private static Retrofit retrofit = null;
 
-    public static Retrofit getClient() {
+    public static ApiService getApiService() {
         if (retrofit == null) {
-            //logging interceptor for debugging
+            // 1. Buat Interceptor untuk logging
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            //logging interceptor for debugging
 
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            // 2. Buat OkHttpClient dan tambahkan interceptor
+            OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(loggingInterceptor)
                     .build();
 
+            // 3. Bangun Retrofit dengan client yang sudah memiliki logger
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
-                    .client(okHttpClient)
+                    .client(client) // <-- Tambahkan client di sini
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-        return retrofit;
-    }
-
-    public static ApiService getApiService() {
-        return getClient().create(ApiService.class);
+        return retrofit.create(ApiService.class);
     }
 }

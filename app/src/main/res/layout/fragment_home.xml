@@ -14,13 +14,42 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lagu Populer"
-            android:textColor="@color/black"
-            android:textSize="25sp"
-            android:textStyle="bold" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lagu_populer"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btn_settings"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:contentDescription="Settings"
+                android:scaleType="centerInside"
+                android:layout_gravity="end" />
+
+            <ImageButton
+                android:id="@+id/btn_refresh"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_toLeftOf="@id/btn_settings"
+                android:layout_toStartOf="@id/btn_settings"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/ic_popup_sync"
+                android:contentDescription="Refresh"
+                android:scaleType="centerInside"
+                android:layout_gravity="end" />
+        </RelativeLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -43,11 +72,11 @@
                 android:layout_gravity="center" />
 
             <TextView
-                android:id="@+id/empty_popular_text"
+                android:id="@+id/empty_popular_songs"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="Gagal memuat lagu populer."
+                android:text="@string/gagal_memuat_lagu_populer"
                 android:visibility="gone"/>
         </FrameLayout>
 
@@ -55,7 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Baru Saja Dinilai"
+            android:text="@string/baru_saja_dinilai"
             android:textColor="@color/black"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -74,18 +103,12 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_track" />
 
-            <include
-                android:id="@+id/empty_rated_view"
-                layout="@layout/item_empty_state"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
             <TextView
-                android:id="@+id/empty_rated_text"
+                android:id="@+id/empty_recently_rated"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="Anda belum memberi rating lagu."
+                android:text="@string/anda_belum_memberi_rating"
                 android:visibility="gone"/>
         </FrameLayout>
 
